@@ -1,11 +1,10 @@
 import os
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from sqlalchemy import text
 from datetime import datetime, timezone
 from flask_migrate import Migrate
-from flask import jsonify
 
 
 
@@ -29,7 +28,7 @@ def test_db():
         db.session.execute(text("SELECT 1"))
         return "Database Connection Successfull"
 
-    except Exception as e:
+    except Exception as e:  
         return f"Error: {str(e)}"
 
 class Transaction(db.Model):
@@ -77,12 +76,39 @@ def create_transaction():
 def get_transaction():
     transactions = Transaction.query.all()
     if not transactions:
-            return jsonify({"message": "transaction not found"}), 404
+        return jsonify({"message": "transaction not found"}), 404
     return jsonify([t.to_dict() for t in transactions]), 200
 
-    
+
+@app.route("/transactions/<id>", methods = ["PUT"])
+def update_transaction(id):
+    try:
+        id = int(id)
+        transaction = Transaction.query.get(id)
+        if not transaction:
+            return jsonify({"message": "id not found"}), 404
+
+        data = request.get_json()
+
+        if data.get("type"):
+            transaction.type = data.get("type")
+        if data.get("amount"):
+            transaction.amount = data.get("amount")
+        if data.get("category"):
+            transaction.category = data.get("category")
+        if data.get("description"):
+            transaction.description = data.get("description")
+        if data.get("date"):
+            transaction.date = datetime.fromisoformat(data.get("date"))
 
         
+        db.session.commit()
+        return jsonify(transaction.to_dict()), 200
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 400
+    
+    
+    
 
 
 with app.app_context():
