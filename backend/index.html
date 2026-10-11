@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Budget Tracker</h1>
+    <h2>Create Transaction</h2>
+    <form id = "transactionForm">
+        <input type = "text" id = "type" placeholder = "Type (income/expense)">
+        <input type = "number" id = "amount" placeholder = "Amount">
+        <input type = "text" id = "category" placeholder = "Category">
+        <input type = "text" id = "description" placeholder = "Description">
+        <input type = "date" id = "date" placeholder= "Date">
+        <button type = "submit">Create</button>
+    </form>
+
+    <h2>Transactions</h2>
+    <button id = "fetchBtn">Fetch Transactions</button>
+
+    <div id = "transactionsList"></div>
+    <script src="script.js"></script>
+
+</body>
+</html>

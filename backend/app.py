@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, jsonify
-from sqlalchemy import text
+from sqlalchemy import text, delete
 from datetime import datetime, timezone
 from flask_migrate import Migrate
 
@@ -72,13 +72,16 @@ def create_transaction():
     except Exception as e:
         return{"Error": str(e)}, 400
 
-@app.route("/transactions", methods = ["GET"])
-def get_transaction():
-    transactions = Transaction.query.all()
-    if not transactions:
-        return jsonify({"message": "transaction not found"}), 404
-    return jsonify([t.to_dict() for t in transactions]), 200
-
+@app.route("/transactions/<id>", methods = ["GET"])
+def get_transaction(id):
+    try:
+        id = int(id)
+        transactions = Transaction.query.get(id)
+        if not transactions:
+            return jsonify({"message": "transaction not found"}), 404
+        return jsonify(transactions.to_dict()), 200
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 400
 
 @app.route("/transactions/<id>", methods = ["PUT"])
 def update_transaction(id):
@@ -106,13 +109,23 @@ def update_transaction(id):
         return jsonify(transaction.to_dict()), 200
     except Exception as e:
         return jsonify({"Error": str(e)}), 400
-    
-    
-    
+
+@app.route("/transactions/<id>", methods = ["DELETE"])
+def delete_transaction(id):
+    try:
+        id = int(id)
+        transaction = Transaction.query.get(id)
+        if not transaction:
+            return jsonify({"message": "id not found"}), 404
+        db.session.delete(transaction)
+        db.session.commit()    
+        return jsonify({"message": "transaction deleted"}), 200
+    except Exception as e:
+        return jsonify({"Error": str(e)}), 400
 
 
 with app.app_context():
     db.create_all()
 
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run(debug = True)   
