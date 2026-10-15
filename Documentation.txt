@@ -286,22 +286,333 @@ $Status Codes:
 400 = Bad Request
 404 = Not Found
 
+======================================Phase8==================================================
+$FrontEnd
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+</head>
+<body>
+    <h1>Budget Tracker</h1>
+    
+    <!-- ==================== CREATE TRANSACTION FORM ==================== -->
+    <h2>Create Transaction</h2>
+    <form id="transactionForm">
+        <input 
+            type="text" 
+            id="type" 
+            placeholder="Type (income/expense)"
+            required
+        >
+        <input 
+            type="number" 
+            id="amount" 
+            placeholder="Amount"
+            required
+        >
+        <input 
+            type="text" 
+            id="category" 
+            placeholder="Category"
+            required
+        >
+        <input 
+            type="text" 
+            id="description" 
+            placeholder="Description"
+            required
+        >
+        <input 
+            type="date" 
+            id="date"
+            required
+        >
+        <button type="submit">Create Transaction</button>
+    </form>
+
+    <!-- ==================== FETCH AND DISPLAY TRANSACTIONS ==================== -->
+    <h2>Transactions</h2>
+    <button id="fetchBtn">Fetch Transactions</button>
+
+    <!-- Container where transactions will be displayed -->
+    <div id="transactionsList"></div>
+
+    <!-- Load JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
+
+$JavaScript
+/**
+ * ========================================
+ * BUDGET TRACKER - FRONTEND SCRIPT
+ * ========================================
+ * This script handles all frontend functionality:
+ * - Fetching transactions from the API
+ * - Creating new transactions
+ * - Displaying transactions on the page
+ */
+
+/**
+ * Fetch all transactions from the API
+ * Makes a GET request to /transactions endpoint
+ * Then displays them on the page
+ */
+async function fetchTransactions() {
+    try {
+        // Send GET request to the API
+        const response = await fetch('http://localhost:5000/transactions');
+        
+        // Convert the response to JSON
+        const data = await response.json();
+        
+        // Display the transactions on the page
+        displayTransactions(data);
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
+    }
+}
+
+/**
+ * Display transactions on the page
+ * Creates a div for each transaction and adds it to the DOM
+ * 
+ * @param {Array} transactions - Array of transaction objects from the API
+ */
+function displayTransactions(transactions) {
+    // Get the container where transactions will be displayed
+    const container = document.getElementById('transactionsList');
+    
+    // Clear previous content
+    container.innerHTML = '';
+    
+    // Loop through each transaction
+    transactions.forEach(transaction => {
+        // Create a new div element for this transaction
+        const div = document.createElement('div');
+        
+        // Set the text content (type - amount - category - description)
+        div.textContent = `${transaction.type} - $${transaction.amount} - ${transaction.category} - ${transaction.description}`;
+        
+        // Add the div to the container
+        container.appendChild(div);
+    });
+}
+
+/**
+ * Create a new transaction from the form
+ * Gets form values, sends POST request to API, then refreshes the list
+ * 
+ * @param {Event} event - The form submission event
+ */
+async function createTransaction(event) {
+    // Prevent the form from refreshing the page
+    event.preventDefault();
+
+    // Get the values from each form input
+    const type = document.getElementById('type').value;
+    const amount = document.getElementById('amount').value;
+    const category = document.getElementById('category').value;
+    const description = document.getElementById('description').value;
+    const date = document.getElementById('date').value;
+    
+    // Create an object with the transaction data
+    const transactionData = {
+        type: type,
+        amount: parseFloat(amount),  // Convert to number
+        category: category,
+        description: description,
+        date: date
+    };
+
+    try {
+        // Send POST request to create the transaction
+        const response = await fetch('http://localhost:5000/transactions', {
+            method: 'POST',  // HTTP method for creating
+            headers: {
+                'Content-Type': 'application/json'  // Tell server we're sending JSON
+            },
+            body: JSON.stringify(transactionData)  // Convert object to JSON string
+        });
+        
+        // Get the response from the server
+        const result = await response.json();
+        
+        // Log the result for debugging
+        console.log('Transaction created:', result);
+        
+        // Refresh the transaction list to show the new transaction
+        fetchTransactions();
+        
+        // Clear the form inputs
+        document.getElementById('transactionForm').reset();
+    } catch (error) {
+        console.error('Error creating transaction:', error);
+    }
+}
+
+/**
+ * ========================================
+ * EVENT LISTENERS - Connect buttons/forms to functions
+ * ========================================
+ */
+
+// When the "Fetch Transactions" button is clicked, fetch and display transactions
+document.getElementById('fetchBtn').addEventListener('click', fetchTransactions);
+
+// When the form is submitted, create a new transaction
+document.getElementById('transactionForm').addEventListener('submit', createTransaction);
+
+$Current System Flow
+User fills form → JavaScript captures data → POST to Flask API → 
+Database saves transaction → GET all transactions → Display on page
 
 
+======================================Phase9==================================================
+$Added Login Page
+#Initialized the input values in html
+<div id = "loginSection">
+        <h2>Login</h2>
+        <form id  = "loginForm">
+            <input 
+                type="text"
+                id = "loginUsername"
+                placeholder = "Username"
+                required
+            >
+            <input
+                type = "password"
+                id = "loginPassword"
+                placeholder = "Password"
+                required
+            >
+            <button type = "submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="#" id = "toggleRegister">Sign Up</a></p>
+    </div>
+    
+#Register 
+<div id ="registerSection" style = "display: none;">
+        <h2>Sign Up</h2>
+        <form id = "registerForm">
+            <input 
+                type="text"
+                id = "regUsername"
+                placeholder = "Username"
+                required    
+            >
+            <input 
+                type="email"
+                id = "regEmail"
+                placeholder = "Email"
+                required
+            >
+            <input 
+                type="password"
+                id = "regPassword"
+                placeholder="Password"
+                required
+            >
+            <button type = "submit">Sign Up</button>
+        </form>
+            <p>Already have an account? <a href="#" id = "toggleLogin">Login</a></p>
+    </div>
+
+#Scripts
+-Login funstionality
+async function handleLogin(event){
+    event.preventDefault();
+
+    const username = document.getElementById("loginUsername").value;
+    const password = document.getElementById("loginPassword").value;
+
+    try{
+        const response = await fetch("http://localhost:5000/login",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify({username, password})
+        });
+        const result = await response.json();
+
+        if (response.ok){
+            console.log("Logged in", result);
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("registerSection").style.display = "none";
+            document.getElementById("appSection").style.display = "block";
+
+            document.getElementById("loginForm").reset();
+        }else {
+            alert("Login failed: " + result.error);
+        }
+    }catch(error){
+        console.error("Error logging in: ", error);
+        alert("Error: " + error);
+    }
+}
+-Register functionality
+async function handleRegister(event) {
+    event.preventDefault();
+
+    const username = document.getElementById("regUsername").value;
+    const email = document.getElementById("regEmail").value;
+    const password = document.getElementById("regPassword").value;
+
+    try{
+
+        const response = await fetch ("http://localhost:5000/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body:JSON.stringify({username, email, password})
+        });
+        const result = await response.json();
+        
+        if (response.ok){
+            console.log("Registered: ", result);
+            alert("Account created successfully! Please login. ");
+
+            document.getElementById("registerForm").reset();
+            document.getElementById("registerSection").style.display = "none";
+            document.getElementById("loginSection").style.display = "block";
+    } else {
+        alert("Registration failed: " + result.error);
+    }
+}catch (error){
+    console.error("Error registering: ", error);
+    alert("Error: " + error);
+    }
+}
+document.getElementById("toggleRegister").addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("registerSection").style.display = "block";
+});
+document.getElementById("toggleLogin").addEventListener("click", (e) =>{
+    e.preventDefault();
+
+    document.getElementById("loginSection").style.display = "block";
+    document.getElementById("registerSection").style.display = "none";
+});
 
 
-
-
-
-
-
-
-
-
-API EndPoints
+API EndPoints for testing 
 Test DB	GET	/test-db	curl http://localhost:5000/test-db
 Create	POST	/transactions	curl -X POST http://localhost:5000/transactions -H "Content-Type: application/json" -d '{"type":"expense","amount":50.00,"category":"food","description":"lunch","date":"2026-10-08"}'
 Read All	GET	/transactions	curl http://localhost:5000/transactions
 Read One	GET	/transactions/<id>	curl http://localhost:5000/transactions/1
 Update	PUT	/transactions/<id>	curl -X PUT http://localhost:5000/transactions/1 -H "Content-Type: application/json" -d '{"amount":75.00,"category":"groceries"}'
 Delete	DELETE	/transactions/<id>	curl.exe -X DELETE http://localhost:5000/transactions/2
+
+#Add Delete function
+-initialize the button on index.html
+-make the function in js
+-API call
+
+

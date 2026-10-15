@@ -1,0 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #0f0f0f;
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #121212;
+    border-radius: 8px;
+    padding: 40px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    color: #1DB954;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2.5em;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+h2 {
+    color: #ffffff;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+input {
+    padding: 12px 16px;
+    background: #282828;
+    border: 1px solid #404040;
+    border-radius: 24px;
+    font-size: 0.95em;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+input::placeholder {
+    color: #b3b3b3;
+}
+
+input:focus {
+    outline: none;
+    border-color: #1DB954;
+    background: #333333;
+    box-shadow: 0 0 8px rgba(29, 185, 84, 0.3);
+}
+
+button {
+    padding: 12px 32px;
+    background: #1DB954;
+    color: #000000;
+    border: none;
+    border-radius: 24px;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #1ed760;
+    transform: scale(1.04);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#fetchBtn {
+    align-self: flex-start;
+}
+
+#transactionsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+#transactionsList div {
+    background: #282828;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #404040;
+    transition: all 0.3s ease;
+    color: #b3b3b3;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+#transactionsList div:hover {
+    background: #333333;
+    border-color: #1DB954;
+    color: #ffffff;
+    box-shadow: 0 8px 16px rgba(29, 185, 84, 0.2);
+}
